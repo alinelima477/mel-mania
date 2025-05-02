@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mel Mania - Loja Feminina</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+    }
+    .hero {
+  background-image: url('imagens/IMG_4297.PNG');
+  background-size: cover;
+  background-position: center;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+    
+    .hero h1 {
+      font-size: 3em;
+      text-shadow: 3px 3px 6px black;
+      border: 2px solid white;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.5);
+    }
+    nav {
+      margin: 10px 0;
+    }
+    nav a {
+      margin: 0 15px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .container {
+      width: 90%;
+      margin: auto;
+      padding: 20px;
+    }
+    .content-section {
+      margin-top: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .product {
+      flex: 1 1 calc(33.333% - 20px);
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .product img {
+      width: 60%;
+      height: 50%;
+      object-fit:cover;
+      border-radius: 4px;
+    }
+    .product p {
+      margin: 10px 0;
+    }
+    h2, h3 {
+      color: #222;
+    }
+    button {
+      background-color: #000;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    footer {
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+    }
+    .social-icons img {
+      width: 40px;
+    }
+    @media (max-width: 768px) {
+      .product {
+        flex: 1 1 100%;
+      }
+    }
+    #carrinho {
+      position: fixed;
+      top: 0;
+      right: 0;
+      background: #fff;
+      color: #000;
+      padding: 15px;
+      border: 1px solid #ccc;
+      max-width: 300px;
+      z-index: 1000;
+      overflow-y: auto;
+      max-height: 400px;
+      display: none;
+    }
+
+    #btnCarrinho {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #000;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+  </style>
+
+  <script>
+    function showSection(sectionId) {
+      document.querySelectorAll(".content-section").forEach(section => {
+        section.classList.add("hidden");
+      });
+      document.getElementById(sectionId).classList.remove("hidden");
+    }
+
+    let carrinho = [];
+
+    function adicionarAoCarrinho(nome, preco) {
+      const itemExistente = carrinho.find(item => item.nome === nome);
+
+      if (itemExistente) {
+        itemExistente.quantidade += 1;
+      } else {
+        carrinho.push({ nome, preco, quantidade: 1 });
+      }
+
+      atualizarCarrinho();
+    }
+
+    function atualizarCarrinho() {
+  const lista = document.getElementById("listaCarrinho");
+  lista.innerHTML = "";
+
+  
+  carrinho.forEach(item => {
+    const precoTotal = item.quantidade * parseFloat(item.preco.replace(",", "."));
+    const li = document.createElement("li");
+    li.textContent = `${item.quantidade}x ${item.nome} - R$ ${precoTotal.toFixed(2).replace(".", ",")}`;
+    lista.appendChild(li);
+  });
+
+  
+  const total = carrinho.reduce((soma, item) => {
+    return soma + item.quantidade * parseFloat(item.preco.replace(",", "."));
+  }, 0);
+
+  document.getElementById("totalCarrinho").textContent = total.toFixed(2).replace(".", ",");
+
+  document.getElementById("carrinho").style.display = "block";
+}
+    
+
+    function toggleCarrinho() {
+      const carrinhoDiv = document.getElementById("carrinho");
+      carrinhoDiv.style.display = carrinhoDiv.style.display === "none" ? "block" : "none";
+    }
+	
+
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".product").forEach(produto => {
+        const nome = produto.querySelector("p").textContent;
+        const preco = produto.querySelector("strong").textContent.replace("Preço: R$ ", "").replace(",", ".");
+        produto.querySelector("button").addEventListener("click", () => {
+          adicionarAoCarrinho(nome, preco);
+        });
+      });
+    });
+	
+    document.addEventListener("DOMContentLoaded", () => {
+  const comprarButton = document.querySelector("#carrinho button"); 
+  comprarButton.addEventListener("click", () => {
+    if (carrinho.length === 0) {
+      alert("Seu carrinho está vazio.");
+      return;
+    }
+
+    let mensagem = "Olá! Gostaria de comprar os seguintes produtos:%0A";
+    carrinho.forEach(item => {
+      mensagem += - `${item.quantidade}x ${item.nome} (R$ ${item.preco})%0A`;
+    });
+
+    const total = carrinho.reduce((soma, item) => {
+      return soma + item.quantidade * parseFloat(item.preco.replace(",", "."));
+    }, 0).toFixed(2).replace(".", ",");
+
+    mensagem += `%0ATotal: R$ ${total}`;
+
+    const telefone = "5587981121846"; 
+    const url = `https://wa.me/${telefone}?text=${mensagem}`;
+window.open(url, "_blank");
+  });
+});
+
+
+function gerarPayloadPix({ chave, nome, cidade, valor }) {
+  function format(id, value) {
+    const size = value.length.toString().padStart(2, "0");
+    return id + size + value;
+    console.log("→ Payload gerado", payload);
+  }
+
+  const payload =
+    "000201" +
+    format("26",
+      format("00", "BR.GOV.BCB.PIX") +
+      format("01", chave)
+    ) +
+    format("52", "0000") +
+    format("53", "986") +
+    format("54", valor) +
+    format("58", "BR") +
+    format("59", nome.substring(0, 25)) +
+    format("60", cidade.substring(0, 15)) +
+    format("62", format("05", "*")) +
+    "6304";
+
+  return payload + gerarCRC16(payload);
+}
+
+function gerarCRC16(payload) {
+  let polinomio = 0x1021;
+  let resultado = 0xFFFF;
+
+  for (let i = 0; i < payload.length; i++) {
+    resultado ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      if ((resultado <<= 1) & 0x10000) resultado ^= polinomio;
+      resultado &= 0xFFFF;
+    }
+  }
+
+  return resultado.toString(16).toUpperCase().padStart(4, "0");
+}
+
+  </script>
+</head>
+
+<body>
+  <button id="btnCarrinho" onclick="toggleCarrinho()">Ver Carrinho</button>
+  <div id="carrinho">
+    <h3>Seu Carrinho</h3>
+    <ul id="listaCarrinho"></ul>
+    <p>Total: R$ <span id="totalCarrinho">0.00</span></p>
+    <button onclick="gerarQRCodePix()">Comprar Agora</button>
+<div id="qrcodeContainer" style="display: none; margin-top: 20px;"></div>
+    
+  </div>
+
+<header>
+  <div class="hero">
+    <h1></h1>
+  </div>
+  <nav>
+    <a onclick="showSection('perfumes')">Perfumes</a>
+    <a onclick="showSection('roupas')">Roupas</a>
+    <a onclick="showSection('bolsas')">Bolsas</a>
+    <a onclick="showSection('joias')">Joias</a>
+    <a onclick="showSection('maquiagens')">Maquiagens</a>
+    <a onclick="showSection('sobre')">Sobre Nós</a>
+    <a onclick="showSection('contato')">Contato</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <section id="perfumes" class="content-section">
+    <h2>Perfumes</h2>
+    <div class="product-list">
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4288.PNG" alt="Perfume ">
+        <p>Deo Colônia Hello Hello Nah Cardoso Ciclo Cosmésticos 50 ml </p>
+        <p><strong>Preço: R$ 74,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4286.PNG" alt="Perfume ">
+        <p>Perfume Feminino, com Fragrância Floral </p>
+        <p><strong>Preço: R$ 99,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4287.PNG" alt="Perfume ">
+        <p>Delina Parfum de Marly Eau de parfum - Brand Collection no 151 </p>
+        <p><strong>Preço: R$ 99,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4289.PNG" alt="Perfume ">
+        <p>Perfume Árabe 100ML Perfume Importado Perfume Feminino Perfume Masculino Embalagem de Vidro A Base de Óleo</p>
+        <p><strong>Preço: R$ 29,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4290.PNG" alt="Perfume ">
+        <p>Perfume 50ML Importados Feminina F-207</p>
+        <p><strong>Preço: R$ 29,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4291.PNG" alt="Perfume ">
+        <p>Perfumes importados Feminino 50ML</p>
+        <p><strong>Preço: R$ 29,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="roupas" class="content-section hidden">
+    <h2>Roupas</h2>
+    <div class="product-list">
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4312.PNG" alt="Roupa 1">
+        <p>Vestido Colado Longo Suplex com fenda costas nuas trançadas elegante empina bumbum</p>
+        <p><strong>Preço: R$ 89,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4313.PNG" alt="Roupa 2">
+        <p>INAWLY Vestido Feminino Bodycon De Manga Longa Plissado De Cor Sólida</p>
+        <p><strong>Preço: R$ 69,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4314.PNG" alt="Roupa 2">
+        <p>Vestido curto estrela com bojo muito leve e confortável</p>
+        <p><strong>Preço: R$ 79,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4315.PNG" alt="Roupa 2">
+        <p>Vestido Feminino Tomara Que Caia Detalhe De Abertura Central Cintura Contrastada Alfaiataria Nova Moda 2025</p>
+        <p><strong>Preço: R$ 79,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4316.PNG" alt="Roupa 2">
+        <p>Vestido Três Argolas Com Saia e Croppd. Moda Gringa</p>
+        <p><strong>Preço: R$ 49,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4317.PNG" alt="Roupa 2">
+        <p>Vestido Elegante Longo Mula Manca Fenda Lateral</p>
+        <p><strong>Preço: R$ 49,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4318.PNG" alt="Roupa 2">
+        <p>Vestido Longo Com Fenda Lateral Manga Longa</p>
+        <p><strong>Preço: R$ 69,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4319.PNG" alt="Roupa 2">
+        <p>Swisz Vestido Longo Envelope Fenda Alcinha Roupa Feminina</p>
+        <p><strong>Preço: R$ 69,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4320.PNG" alt="Roupa 2">
+        <p>Vestido Feminino com Fenda Babado Efeito modelador Elegante Festa</p>
+        <p><strong>Preço: R$ 79,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="bolsas" class="content-section hidden">
+    <h2>Bolsas</h2>
+    <div class="product-list">
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4321.PNG" alt="Bolsa 1">
+        <p>Bolsa de Nuvem Plissada PU Bolsa De Ombro Para Mulheres Nova Moda</p>
+        <p><strong>Preço: R$ 39,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4322.PNG" alt="Bolsa 2">
+        <p>Bolsa Feminina Lorena Média Alça Transversal Tote Quadrada e de Mão Lateral</p>
+        <p><strong>Preço: R$ 49,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4323.PNG" alt="Bolsa 2">
+        <p>Bolsa Feminina Baguete de Ombro Brilhante com Fecho de Zíper</p>
+        <p><strong>Preço: R$ 39,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4324.PNG" alt="Bolsa 2">
+        <p>KS Karla Samenho cosmetics and accessories Bolsa Sacola Grande Espaçosa Versátil Tote+ Bolsa Pequena Elegante Alça Ombro + Carteira Pequena  Fechamento Em Imã</p>
+        <p><strong>Preço: R$ 79,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4325.PNG" alt="Bolsa 2">
+        <p>4 Peças Conjuntos De Bolsas Femininas, Bolsa De Ombro, Bolsa Com Borla,</p>
+        <p><strong>Preço: R$ 89,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4326.PNG" alt="Bolsa 2">
+        <p>Bolsa Feminina Bauzinho de Laço, Bolsa Pequena, Elegante, Luxuosa, Dia a Dia, Festa, Alça Lisa em Sintético e Corrente, Fechamento em Magnético, Passeio, Sintético PU. Gaby Show</p>
+        <p><strong>Preço: R$ 39,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="joias" class="content-section hidden">
+    <h2>Joias</h2>
+    <div class="product-list">
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4327.PNG" alt="Joia 1">
+        <p>6 Peças Conjunto de Joias com Estilo Coreano, Brincos, Colar, Pulseira, Anel, Conjunto de Joias da Moda Adequadas para Dia dos Namorados, Uso Diário e Presentes de Festivais</p>
+        <p><strong>Preço: R$ 24,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4328.PNG" alt="Joia 2">
+        <p>Conjunto de 3 peças de Colar, Brincos e Pulseira com Strass de Luxo - Adequado para Diversas Atividades</p>
+        <p><strong>Preço: R$ 19,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4329.PNG" alt="Joia 2">
+        <p>Conjunto de 3 Peças Conjunto de Jóias de Colar e Brincos Gota de Água Azul Simples, Adequado para Uso Diário, Casamentos, Festas, etc. das Mulheres</p>
+        <p><strong>Preço: R$ 19,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4330.PNG" alt="Joia 2">
+        <p>3 Peças Conjunto de Joias de Colar + Brincos Elegante para Mulheres, Corrente Plana Dourada de Cobra da Moda, Disco Listrado Geométrico, Colar Misto com Pingente de Coração de Pérola Falsa, Corrente Clavicular Delicada para Uso Diário</p>
+        <p><strong>Preço: R$ 19,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4331.PNG" alt="Joia 2">
+        <p>3 Peças Conjunto de Colar Elegante, Criativo, Personalizado, Versátil e Fashionable para Uso Diário</p>
+        <p><strong>Preço: R$ 19,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4332.PNG" alt="Joia 2">
+        <p>5 peças Conjunto de joias Strass Decoração de coração</p>
+        <p><strong>Preço: R$ 19,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+     
+  </section>
+
+  <section id="maquiagens" class="content-section hidden">
+    <h2>Maquiagens</h2>
+    <div class="product-list">
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4333.PNG" alt="Maquiagem 1">
+        <p>Tesouro direto Import Batom cremoso longa duração, Praia - 12 Cores Marcantes e Vibrantes</p>
+        <p><strong>Preço: R$ 17,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4334.PNG" alt="Maquiagem 2">
+        <p>Gloss Lip Volumoso Aumenta boca Vegano Max Love - 5ML</p>
+        <p><strong>Preço: R$ 17,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4335.PNG" alt="Maquiagem 2">
+        <p>Batom Líquido Matte - Melu Ruby Rose</p>
+        <p><strong>Preço: R$ 17,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4336.PNG" alt="Maquiagem 2">
+        <p>Máscara Para Cílios A Prova D'Água Tango 2 em 1 4D PA-7204 Volumoso</p>
+        <p><strong>Preço: R$ 17,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4337.PNG" alt="Maquiagem 2">
+        <p>Delineador Líquido Preto Ruby Rose HB8406</p>
+        <p><strong>Preço: R$ 17,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+      <div class="product">
+        <img src="C:\Users\aline\OneDrive\Desktop\IMG_4338.PNG" alt="Maquiagem 2">
+        <p>Gloss Morango Estilo Coreano Japonês com Cor Kpop Brilho Labial Gradient Lips</p>
+        <p><strong>Preço: R$ 17,99</strong></p>
+        <button>Adicionar ao Carrinho</button>
+      </div>
+ </section>
+
+  <section id="sobre" class="content-section hidden">
+    <h2>Sobre Nós</h2>
+    <p>Olá! Meu nome é Aline Lima e sou fundadora da Mel Mania.
+Criamos essa loja para trazer mais estilo e qualidade para mulheres de todo o Brasil.
+
+A Mel Mania foi fundada em 2024 e nasceu com o propósito de oferecer as principais tendências da moda feminina com qualidade e preço justo. Atendemos com carinho todo o Nordeste e enviamos para o Brasil inteiro, levando beleza e confiança para cada cliente.
+
+CNPJ: 55.957.183/0001-20</p>
+  </section>
+
+  <section id="contato" class="content-section hidden">
+  <h2>Contato</h2>
+  <p>✉ Email: <a href="mailto:mel.mania26@gmail.com">mel.mania26@gmail.com</a></p>
+  <p>📍 Endereço: Serra Talhada, Pernambuco</p>
+  <div class="social-icons">
+    <p>
+      <a href="https://www.instagram.com/mel.indiretas" target="_blank">📸 Instagram</a>
+    </p>
+    <p>
+      <a href="https://wa.me/87981121846" target="_blank">📱 WhatsApp</a>
+    </p>
+  </div>
+
+  </section>
+
+</div>
+
+<footer>
+  <p>Obrigada por visitar a Mel Mania! Esperamos te ver novamente em breve, com ainda mais novidades e estilo para você.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</body>
+</html>
